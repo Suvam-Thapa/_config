@@ -18,6 +18,38 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
+-- Fast buffer next / prev
+vim.keymap.set("n", "<leader>bn", ":bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<leader>bp", ":bprev<CR>", { desc = "Previous buffer" })
+
+local term_buf = nil
+
+local function toggle_term()
+	if not term_buf or not vim.api.nvim_buf_is_valid(term_buf) then
+		-- create new terminal buffer in bottom split
+		vim.cmd("botright split")
+		vim.cmd("terminal")
+		term_buf = vim.api.nvim_get_current_buf()
+		vim.bo[term_buf].buflisted = false
+		vim.api.nvim_buf_set_name(term_buf, "term://singleton")
+		vim.cmd("startinsert")
+	else
+		local wins = vim.fn.win_findbuf(term_buf)
+		if #wins > 0 then
+			-- visible → hide it
+			vim.api.nvim_win_hide(wins[1])
+		else
+			-- hidden → show it
+			vim.cmd("botright split")
+			vim.api.nvim_set_current_buf(term_buf)
+			vim.cmd("startinsert")
+		end
+	end
+end
+
+-- <leader>t  : open / toggle
+vim.keymap.set({ "n", "t" }, "<leader>t", toggle_term, { silent = true })
+
 -- Just some shortcuts --
 
 ---- Navigation and movements ----
