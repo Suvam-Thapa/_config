@@ -9,9 +9,20 @@ return {
 		},
 		config = function()
 			local null_ls = require("null-ls")
+			-- local h = require("null-ls.helpers")
 			local formatting = null_ls.builtins.formatting
 			local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
-
+			-- local dart_format = h.make_builtin({
+			-- 	name = "dart_format",
+			-- 	method = null_ls.methods.FORMATTING,
+			-- 	filetypes = { "dart" },
+			-- 	generator_opts = {
+			-- 		command = "dart",
+			-- 		args = { "format" },
+			-- 		to_stdin = true,
+			-- 	},
+			-- 	factory = h.formatter_factory,
+			-- })
 			require("mason-null-ls").setup({
 				ensure_installed = {
 					"black",
@@ -47,6 +58,8 @@ return {
 					formatting.stylua,
 					-- Python
 					formatting.black,
+					-- Dart
+					-- dart_format,
 				},
 				-- Format on save
 				on_attach = function(client, bufnr)

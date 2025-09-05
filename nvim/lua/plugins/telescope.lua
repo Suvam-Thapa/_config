@@ -8,14 +8,14 @@ return {
 	},
 	config = function()
 		require("telescope").setup({
-			-- defaults = {
-			-- 	borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
-			-- },
-			pickers = {
-				find_files = {
-					theme = "dropdown",
-				},
+			defaults = {
+				borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
 			},
+			-- pickers = {
+			-- 	find_files = {
+			-- 		theme = "dropdown",
+			-- 	},
+			-- },
 			extensions = {
 				fzf = {
 					fuzzy = true,

@@ -234,6 +234,31 @@ return {
 			},
 		})
 
+		-- lspconfig.dartls.setup({
+		-- 	capabilities = capabilities,
+		-- 	on_attach = on_attach,
+		-- 	filetypes = { "dart" },
+		-- 	cmd = { "dart", "language-server", "--client-id", "neovim", "--client-version", "1" },
+		-- 	root_dir = lspconfig.util.root_pattern("pubspec.yaml"),
+		-- 	init_options = {
+		-- 		closingLabels = true,
+		-- 		flutterOutline = true,
+		-- 		onlyAnalyzeProjectsWithOpenFiles = true,
+		-- 		outline = true,
+		-- 		suggestFromUnimportedLibraries = true,
+		-- 	},
+		-- 	settings = {
+		-- 		dart = {
+		-- 			completeFunctionCalls = true,
+		-- 			showTodos = true,
+		-- 			analysisExcludedFolders = { ".dart_tool", "build" },
+		-- 			updateImportsOnRename = true,
+		-- 			lineLength = 80,
+		-- 			renameFilesWithClasses = "prompt",
+		-- 		},
+		-- 	},
+		-- })
+
 		-- Setup mason-lspconfig
 		require("mason-lspconfig").setup({
 			ensure_installed = {

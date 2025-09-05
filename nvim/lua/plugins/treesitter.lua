@@ -9,7 +9,7 @@ return {
 		require("nvim-treesitter.configs").setup({
 			modules = {},
 			ignore_install = {},
-			ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "html", "css", "tmux", "bash" },
+			ensure_installed = { "lua", "python", "javascript", "typescript", "tsx", "html", "css", "tmux", "bash" }, -- dart
 			sync_install = false,
 			auto_install = true,
 			highlight = {
