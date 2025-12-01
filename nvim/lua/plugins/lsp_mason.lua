@@ -134,7 +134,7 @@ return {
 		})
 
 		-- Tailwind CSS (unmigrated, so use lspconfig.setup)
-		lspconfig.tailwindcss.setup({
+		vim.lsp.config("tailwindcss", {
 			capabilities = capabilities,
 			on_attach = on_attach,
 			settings = {

@@ -1,29 +1,30 @@
 -- return {
--- 	"ptdewey/darkearth-nvim",
--- 	lazy = false,
--- 	priority = 1000,
--- 	config = function()
--- 		vim.cmd.colorscheme("darkearth")
--- 	end,
--- }
-
--- return {
 -- 	"catppuccin/nvim",
 -- 	name = "catppuccin",
--- 	lazy = true,
--- 	event = { "VeryLazy" },
--- 	priority = 1000,
+-- 	lazy = false,
+-- 	priority = 1200,
 -- 	config = function()
--- 		vim.cmd.colorscheme("catppuccin-mocha")
+-- 		vim.cmd.colorscheme("catppuccin-latte")
+-- 	end,
+-- }
+--
+-- return {
+-- 	"folke/tokyonight.nvim",
+-- 	lazy = false,
+-- 	priority = 1200,
+-- 	opts = {},
+-- 	config = function()
+-- 		vim.cmd.colorscheme("tokyonight-day")
 -- 	end,
 -- }
 
 return {
-	"folke/tokyonight.nvim",
+	"neanias/everforest-nvim",
+	version = false,
 	lazy = false,
 	priority = 1200,
-	opts = {},
 	config = function()
-		vim.cmd.colorscheme("tokyonight-night")
+		require("everforest").setup({})
+		vim.cmd.colorscheme("everforest")
 	end,
 }
