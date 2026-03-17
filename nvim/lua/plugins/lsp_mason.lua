@@ -2,6 +2,7 @@ return {
 	"williamboman/mason.nvim",
 	dependencies = {
 		"williamboman/mason-lspconfig.nvim",
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
 		"neovim/nvim-lspconfig",
 		"hrsh7th/cmp-nvim-lsp",
 	},
@@ -18,7 +19,27 @@ return {
 			},
 		})
 
-		local lspconfig = require("lspconfig")
+		-- Setup mason-lspconfig
+		require("mason-lspconfig").setup({
+			ensure_installed = {
+				"lua_ls",
+				"pyright",
+				"ts_ls",
+				"tailwindcss",
+				"emmet_language_server",
+				"html",
+				"cssls",
+			},
+		})
+		require("mason-tool-installer").setup({
+			ensure_installed = {
+				"prettier",
+				"stylua",
+				"black",
+				"biome",
+			},
+		})
+
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 		local signs = {
@@ -174,7 +195,7 @@ return {
 					},
 					validate = {
 						scripts = true,
-						styles = true,
+						styles = false,
 					},
 				},
 			},

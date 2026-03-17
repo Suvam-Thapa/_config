@@ -24,7 +24,9 @@ return {
 	lazy = false,
 	priority = 1200,
 	config = function()
-		require("everforest").setup({})
+		require("everforest").setup({
+			ui_contrast = "high",
+		})
 		vim.cmd.colorscheme("everforest")
 	end,
 }
