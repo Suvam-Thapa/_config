@@ -1,6 +1,7 @@
 --[[
 === Options ===
 --]]
+vim.loader.enable()
 vim.opt.background = "light"
 
 vim.opt.number = true

@@ -5,7 +5,7 @@ return {
 		require("conform").setup({
 			formatters_by_ft = {
 				lua = { "stylua" },
-				python = { "black" },
+				python = { "ruff_format" },
 				javascript = { "biome" },
 				typescript = { "biome" },
 				javascriptreact = { "biome" },
@@ -13,15 +13,15 @@ return {
 				json = { "prettier" },
 				-- css/html etc. via biome or prettier as needed
 			},
+			formatters = {
+				black = {
+					prepend_args = { "--target-version", "py312" }, -- Force support for Python 3.12
+				},
+			},
 			format_on_save = {
 				timeout_ms = 3000, -- was your previous issue
 				lsp_fallback = false,
 			},
 		})
-
-		-- Manual format keymap (same as before)
-		vim.keymap.set({ "n", "v" }, "<leader>f", function()
-			require("conform").format({ async = false, lsp_fallback = false })
-		end, { desc = "Format" })
 	end,
 }

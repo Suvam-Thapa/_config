@@ -8,9 +8,19 @@ return {
 	},
 	config = function()
 		require("telescope").setup({
-			-- defaults = {
-			-- 	borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
-			-- },
+			defaults = {
+				-- borderchars = { "─", "│", "─", "│", "┌", "┐", "┘", "└" },
+				preview = false,
+				-- preview = {
+				-- 	treesitter = false,
+				-- },
+				mappings = {
+					i = {
+						["<C-j>"] = require("telescope.actions").move_selection_next,
+						["<C-k>"] = require("telescope.actions").move_selection_previous,
+					},
+				},
+			},
 			pickers = {
 				find_files = {
 					theme = "dropdown",
@@ -28,7 +38,7 @@ return {
 	end,
 	keys = {
 		{
-			"<leader>ff",
+			"<leader>f",
 			function()
 				require("telescope.builtin").find_files({
 					search_dirs = {
@@ -41,28 +51,28 @@ return {
 			desc = "Telescope find files",
 		},
 		{
-			"<leader>fg",
+			"<leader>g",
 			function()
 				require("telescope.builtin").live_grep()
 			end,
 			desc = "Telescope live grep",
 		},
 		{
-			"<leader>fb",
+			"<leader>b",
 			function()
 				require("telescope.builtin").buffers()
 			end,
 			desc = "Telescope buffers",
 		},
 		{
-			"<leader>fh",
+			"<leader>h",
 			function()
 				require("telescope.builtin").help_tags()
 			end,
 			desc = "Telescope help tags",
 		},
 		{
-			"<leader>h",
+			"<leader>hh",
 			function()
 				vim.cmd("normal! y")
 				local selected_text = vim.fn.getreg('"'):gsub("^%s+", ""):gsub("%s+$", ""):gsub("\n", " ")
