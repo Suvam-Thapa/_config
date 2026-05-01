@@ -29,6 +29,7 @@ return {
 				"emmet_language_server",
 				"html",
 				"cssls",
+				"rust_analyzer",
 			},
 		})
 		require("mason-tool-installer").setup({
@@ -280,16 +281,30 @@ return {
 		-- 	},
 		-- })
 
-		-- Setup mason-lspconfig
-		require("mason-lspconfig").setup({
-			ensure_installed = {
-				"lua_ls",
-				"pyright",
-				"ts_ls",
-				"tailwindcss",
-				"emmet_language_server",
-				"html",
-				"cssls",
+		-- Rust
+		vim.lsp.config("rust_analyzer", {
+			capabilities = capabilities,
+			on_attach = on_attach,
+			settings = {
+				["rust-analyzer"] = {
+					cargo = {
+						allFeatures = true,
+					},
+					checkOnSave = true,
+					check = {
+						command = "clippy",
+					},
+					procMacro = {
+						enable = true,
+					},
+					inlayHints = {
+						bindingModeHints = { enable = false },
+						chainingHints = { enable = true },
+						closingBraceHints = { enable = true, minLines = 25 },
+						parameterHints = { enable = true },
+						typeHints = { enable = true },
+					},
+				},
 			},
 		})
 	end,

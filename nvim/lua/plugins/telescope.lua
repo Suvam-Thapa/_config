@@ -18,6 +18,7 @@ return {
 					i = {
 						["<C-j>"] = require("telescope.actions").move_selection_next,
 						["<C-k>"] = require("telescope.actions").move_selection_previous,
+						["<leader>q"] = require("telescope.actions").close,
 					},
 				},
 			},
@@ -38,7 +39,7 @@ return {
 	end,
 	keys = {
 		{
-			"<leader>f",
+			"<leader>p",
 			function()
 				require("telescope.builtin").find_files({
 					search_dirs = {

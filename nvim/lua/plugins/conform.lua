@@ -11,6 +11,7 @@ return {
 				javascriptreact = { "biome" },
 				typescriptreact = { "biome" },
 				json = { "prettier" },
+				rust = { "rustfmt" },
 				-- css/html etc. via biome or prettier as needed
 			},
 			formatters = {

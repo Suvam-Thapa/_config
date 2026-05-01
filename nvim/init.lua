@@ -40,6 +40,9 @@ vim.g.maplocalleader = "\\"
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "moves lines down in visual selection" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "moves line up in visual selection" })
 
+-- Delete without copying to clipboard
+vim.keymap.set("n", "dd", '"_dd', opts)
+vim.keymap.set("v", "d", '"_d', opts)
 vim.keymap.set("n", "x", '"_x', opts) -- prevent deleted characters from copying to clipboard
 
 vim.keymap.set({ "i", "v" }, "QQ", "<Esc>", { desc = "Exit insert mode with JJ " })
@@ -53,9 +56,8 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 -- Fast buffer next / prev
-vim.keymap.set("n", "<leader>bn", ":bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<leader>bp", ":bprev<CR>", { desc = "Previous buffer" })
-vim.keymap.set("i", "<Esc><BS>", "<C-w>", { noremap = true })
+vim.keymap.set("n", "<leader>n", ":bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<leader>m", ":bprev<CR>", { desc = "Previous buffer" })
 
 --[[
 === Imports ===

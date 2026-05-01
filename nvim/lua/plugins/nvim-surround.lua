@@ -7,13 +7,20 @@ return {
 			-- Configuration here, or leave empty to use defaults
 			--     Old text                    Command         New text
 			-- --------------------------------------------------------------------------------
-			--     surr*ound_words             ysiw)           (surround_words)
-			--     *make strings               ys$"            "make strings"
-			--     [delete ar*ound me!]        ds]             delete around me!
-			--     remove <b>HTML t*ags</b>    dst             remove HTML tags
-			--     "change quot*es"            cs'"            "change quotes"
-			--     <p>or tag* types</p>        csth1<CR>       <h1>or tag types</h1>
-			--     delete(functi*on calls)     dsf             function calls
+			-- surr*ound_words             ysiw)           (surround_words)
+			-- *make strings               ys$"            "make strings"
+			-- [delete ar*ound me!]        ds]             delete around me!
+			-- remove <b>HTML t*ags</b>    dst             remove HTML tags
+			-- "change quot*es"            cs"'            "change quotes"
+			-- <p>or tag* types</p>        csth1<CR>       <h1>or tag types</h1>
+			-- delete(functi*on calls)     dsf             function calls
+			-- S" → surrounds with "double quotes"
+			-- S' → surrounds with 'single quotes'
+			-- S) → surrounds with (parens) no space
+			-- S( → surrounds with ( parens ) with space
+			-- S] → surrounds with [brackets]
+			-- S} → surrounds with {braces}
+			-- St → then type an HTML tag like div<CR> → <div>selection</div>
 		})
 	end,
 }
