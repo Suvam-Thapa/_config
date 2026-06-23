@@ -45,7 +45,7 @@ vim.keymap.set("n", "dd", '"_dd', opts)
 vim.keymap.set("v", "d", '"_d', opts)
 vim.keymap.set("n", "x", '"_x', opts) -- prevent deleted characters from copying to clipboard
 
-vim.keymap.set({ "i", "v" }, "QQ", "<Esc>", { desc = "Exit insert mode with JJ " })
+vim.keymap.set({ "i", "v" }, "QQ", "<Esc>", { desc = "Exit insert mode with QQ" })
 
 vim.api.nvim_create_autocmd("TextYankPost", {
 	desc = "Highlight when yanking (copying) text",

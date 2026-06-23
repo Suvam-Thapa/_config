@@ -1,5 +1,5 @@
 return {
-	"echasnovski/mini.comment",
+   "echasnovski/mini.comment",
 	version = false,
 	dependencies = {
 		"JoosepAlviste/nvim-ts-context-commentstring",
