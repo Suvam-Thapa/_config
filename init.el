@@ -12,10 +12,9 @@
   (require 'use-package))
 
 (use-package gcmh
-  :ensure t)
-
-(add-to-list 'load-path "path-to-gcmh-here")
-(gcmh-mode 1)
+  :ensure t
+  :config
+  (gcmh-mode 1))
 
 ;; ============================================================
 ;; UI
@@ -29,6 +28,14 @@
 (setq inhibit-startup-echo-area-message t)
 (setq initial-scratch-message nil)
 (setq frame-resize-pixelwise t)
+
+;; ============================================================
+;; Terminal Size
+;; ============================================================
+(add-to-list 'display-buffer-alist
+             '("\\*compilation\\*"
+               (display-buffer-reuse-window display-buffer-below-selected)
+               (window-height . 25))) ;; <--- Set to exactly 15 lines tall
 
 ;; ============================================================
 ;; Modeline
@@ -52,7 +59,7 @@
                 mode-line-front-space
                 mode-line-mule-info
                 mode-line-modified
-		        mode-line-remote
+		mode-line-remote
                 "  "
                 "%b"
                 "  "
@@ -68,7 +75,7 @@
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
 (setq display-line-numbers-width-start t)
-(setq display-line-numbers-width 4) ;; fixed width, won't resize as line count grows
+(setq display-line-numbers-width 3) ;; fixed width, won't resize as line count grows
 
 ;; ============================================================
 ;; Dired
@@ -81,7 +88,7 @@
 ;; Font
 ;; ============================================================
 (set-face-attribute 'default nil
-		    :font "JetBrainsMono Nerd Font"
+		    :font "CaskaydiaCove Nerd Font"
 		    :height 160)
 
 ;; ============================================================
@@ -94,48 +101,55 @@
 ;; ============================================================
 ;; Theme
 ;; ============================================================
-;; git clone https://github.com/Theory-of-Everything/everforest-emacs.git ~/.config/emacs/everforest-theme
-(add-to-list 'custom-theme-load-path "~/.config/emacs/everforest-theme")
-(load-theme 'everforest-hard-light t)
-(set-face-attribute 'isearch-fail nil :background 'unspecified)
+(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
+(load-theme 'lena t)
 
 ;; ============================================================
 ;; LSP
 ;; ============================================================
-(use-package lua-mode
-  :ensure t)
+(defun language-server/jedi (&optional _interactive _project)
+  "Use the jedi-language-server inside .py_venv if found upward from this buffer, else fall back to PATH."
+  (let* ((venv-root (locate-dominating-file default-directory ".py_venv"))
+         (bin (and venv-root
+                   (expand-file-name ".py_venv/bin/jedi-language-server" venv-root))))
+    (if (and bin (file-executable-p bin))
+        (list bin)
+      (list "jedi-language-server"))))
+
 (use-package rust-mode
+  :ensure t)
+(use-package lua-mode
   :ensure t)
 
 (use-package eglot
   :hook ((lua-mode . eglot-ensure)
-	 (rust-mode . eglot-ensure))
+	 (rust-mode . eglot-ensure)
+	 (python-mode . eglot-ensure))
   :config
+
   (add-to-list 'eglot-server-programs
                '(rust-mode .
-			   ("systemd-run" "--user" "--scope"
-			    "-p" "MemoryHigh=1G"
-			    "-p" "MemoryMax=1.6G"
+			   ("systemd-run" "--user" "--scope" "--collect"
+			    "-p" "MemoryHigh=1.2G"
+			    "-p" "MemoryMax=1.4G"
 			    "--"  "rust-analyzer"
 			    :initializationOptions
 			    (:check (:command "check")
 				    :numThreads 1))))
+  (add-to-list 'eglot-server-programs
+               '(python-mode . language-server/jedi))  
+
   (setq eglot-ignored-server-capabilities '(:inlayHintProvider))
+
   (add-hook 'eglot-managed-mode-hook
             (lambda ()
               (setq-local eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)))
   (define-key eglot-mode-map (kbd "C-c d") 'xref-find-definitions)
-  (define-key eglot-mode-map (kbd "C-c r") 'xref-find-references)
+  (define-key eglot-mode-map (kbd "C-c h") 'eldoc-doc-buffer)
+  (define-key eglot-mode-map (kbd "C-c n") 'xref-find-references)
   (define-key eglot-mode-map (kbd "C-c a") 'eglot-code-actions)
-  (define-key eglot-mode-map (kbd "C-c n") 'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c r") 'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c e") 'flymake-show-buffer-diagnostics))
-
-(defun my/project-try-cargo (dir)
-  "Treat the nearest Cargo.toml as the project root, instead of falling back to VC root."
-  (when-let ((root (locate-dominating-file dir "Cargo.toml")))
-    (cons 'transient root)))
-
-(add-hook 'project-find-functions #'my/project-try-cargo -10)
 
 (with-eval-after-load 'flymake
   (setq flymake-show-diagnostics-at-end-of-line nil) ;; no inline text
@@ -144,32 +158,37 @@
   (setq flymake-fringe-indicator-position nil))
 
 ;; ============================================================
-;; Compilation
+;; Hooks
 ;; ============================================================
-(require 'ansi-color)
-(require 'compile)
+(defun project-root/cargo (dir)
+  "Treat the nearest Cargo.toml as the project root, instead of falling back to VC root."
+  (when-let ((root (locate-dominating-file dir "Cargo.toml")))
+    (cons 'transient root)))
 
-(setq compilation-scroll-output t)
-
-;; cargo (and most tools) auto-disable color when stdout isn't a tty,
-;; which is what M-x compile gives them. Force it back on so there's
-;; actually something for ansi-color to colorize below.
-(setenv "CARGO_TERM_COLOR" "always")
-
-(defun my/colorize-compilation-buffer ()
-  (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region compilation-filter-start (point))))
-(add-hook 'compilation-filter-hook #'my/colorize-compilation-buffer)
-
-(add-hook 'rust-mode-hook
+(defun compilation/py-venv ()
+  "If a `.py_venv' is found upward from this buffer, prepend its bin/ to
+`compilation-environment' (buffer-locally), so `compile'/`recompile' resolve
+python and other binaries from the venv instead of the system PATH."
+  (when-let* ((venv-root (locate-dominating-file default-directory ".py_venv"))
+              (venv-bin (expand-file-name ".py_venv/bin" venv-root)))
+    (when (file-directory-p venv-bin)
+      (setq-local compilation-environment
+                  (list (concat "PATH=" venv-bin path-separator (getenv "PATH"))
+                        (concat "VIRTUAL_ENV=" (expand-file-name ".py_venv" venv-root)))))))
+(add-hook 'python-mode-hook
           (lambda ()
-            (setq-local compile-command "cargo run")))
+            (setq-local compile-command
+                        (concat "python " (shell-quote-argument (buffer-file-name))))))
 
-(global-set-key (kbd "C-c c") 'compile)
+(add-hook 'python-mode-hook #'compilation/py-venv)
+(add-hook 'project-find-functions #'project-root/cargo -10)
 
 ;; ============================================================
 ;; Tools
 ;; ============================================================
+(use-package zoxide
+  :ensure t)
+
 (use-package vertico
   :ensure t
   :hook (after-init . vertico-mode))
@@ -215,12 +234,17 @@
   :ensure t
   :hook (prog-mode . rainbow-mode))
 
+(use-package rainbow-delimiters
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 (use-package marginalia
   :ensure t
   :hook (after-init . marginalia-mode))
 
 (use-package apheleia
   :ensure t
+  :hook (python-mode . apheleia-mode)
   :config
   (apheleia-global-mode +1))
 
@@ -235,20 +259,94 @@
   (corfu-left-margin-width 0.0)
   (corfu-right-margin-width 0.0))
 
-
 ;; ============================================================
 ;; Keybindings
 ;; ============================================================
-(global-set-key (kbd "C-x s") 'save-buffer)                 ;; save without confirmation 
-(global-set-key (kbd "C-x C-s") 'save-some-buffers)         ;; save with confirmation 
-(global-set-key (kbd "C-SPC") 'execute-extended-command)    ;; extended command ":"
-(global-set-key (kbd "C-x C-o") 'exchange-point-and-mark)   ;; loop mark pointer 
-(global-set-key (kbd "C-x C-f") 'set-fill-column)           ;; NK NK NK NK NK NK NK
-(global-set-key (kbd "C-x f") 'find-file)                   ;; find-file dired
-(global-set-key (kbd "C-x b") 'consult-buffer)              ;; better buffer
-(global-set-key (kbd "C-t") 'forward-word)                  ;; move 1 word forward
-(global-set-key (kbd "C-e") 'backward-word)                 ;; move 1 word backward
-(global-set-key (kbd "C-v") 'set-mark-command)              ;; Mark visual
+;; Defining new key functions
+(defun smart/delete (&optional arg)
+  "Delete the active region if it exists, otherwise delete the character at point."
+  (interactive "P")
+  (if (use-region-p)
+      (delete-region (region-beginning) (region-end))
+    (delete-char (or arg 1))))
+
+(defun my/char-class (char)
+  (cond ((string-match-p "[[:alnum:]_]" (char-to-string char)) 'word)
+        ((string-match-p "[[:space:]\n]" (char-to-string char)) 'whitespace)
+        (t 'punctuation)))
+
+(defun smart/forward-word (&optional arg)
+  "Move forward to the end of the current contiguous class of characters (Word, Punctuation, or Whitespace)."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  (dotimes (_ arg)
+    (unless (eobp)
+      (let ((class (my/char-class (char-after))))
+        (forward-char 1)
+        (while (and (not (eobp))
+                    (eq class (my/char-class (char-after))))
+          (forward-char 1))))))
+
+(defun smart/backward-word (&optional arg)
+  "Move backward to the beginning of the current contiguous class of characters."
+  (interactive "^p")
+  (or arg (setq arg 1))
+  (dotimes (_ arg)
+    (unless (bobp)
+      (let ((class (my/char-class (char-before))))
+        (backward-char 1)
+        (while (and (not (bobp))
+                    (eq class (my/char-class (char-before))))
+          (backward-char 1))))))
+
+;; 'word (aware of _,) 'symbol 
+(defun smart/kill-inner-word ()
+  "Kill the entire symbol/variable under the cursor."
+  (interactive)
+  (if (thing-at-point 'symbol)
+      (let ((bounds (bounds-of-thing-at-point 'symbol)))
+        (kill-region (car bounds) (cdr bounds)))
+    (message "No symbol at point")))
+
+(defun smart/backward-kill-word (&optional arg)
+  "Kill the entire word or whitespace block under the cursor (backward-initiated).
+For punctuation, kills only the immediate character behind the cursor."
+  (interactive "p")
+  (or arg (setq arg 1))
+  (dotimes (_ arg)
+    (unless (bobp)
+      (let* ((class (my/char-class (char-before)))
+             ;; If punctuation, just grab the single char behind point. Otherwise, find block start.
+             (start (cond
+                     ((eq class 'punctuation) (1- (point)))
+                     (t (save-excursion
+                          (while (and (not (bobp))
+                                      (eq class (my/char-class (char-before))))
+                            (backward-char 1))
+                          (point)))))
+             ;; If punctuation, anchor right at point. Otherwise, find block end.
+             (end (cond
+                   ((eq class 'punctuation) (point))
+                   (t (save-excursion
+                        (while (and (not (eobp))
+                                    (eq class (my/char-class (char-after))))
+                          (forward-char 1))
+                        (point))))))
+        (kill-region start end)))))
+;; End
+
+;; Save Files with/without confirmation
+(global-set-key (kbd "C-x s") 'save-buffer)
+(global-set-key (kbd "C-x C-s") 'save-some-buffers)         
+;; Find Find files/buffers
+(global-set-key (kbd "C-x C-f") 'consult-fd)                
+(global-set-key (kbd "C-x f") 'find-file)                   
+(global-set-key (kbd "C-x b") 'consult-buffer)              
+;; Move a word forward/backward
+(global-set-key (kbd "C-t") 'smart/forward-word)                  
+(global-set-key (kbd "C-e") 'smart/backward-word)                 
+;; Set Mark Visual
+(global-set-key (kbd "C-SPC") 'set-mark-command)
 ;; Swap C-l with C-f
 (global-set-key (kbd "C-l") 'forward-char)
 (global-set-key (kbd "C-f") 'recenter-top-bottom)
@@ -256,10 +354,29 @@
 (global-set-key (kbd "C-o") nil)
 (define-prefix-command 'prefix_o)
 (global-set-key (kbd "C-o") 'prefix_o)
-(define-key prefix_o (kbd "h") 'move-beginning-of-line)
-(define-key prefix_o (kbd "l") 'move-end-of-line)
+(with-eval-after-load 'compile
+  ;; Unset C-o in compilation mode so it falls back to global prefix map
+  (define-key compilation-mode-map (kbd "C-o") nil))
+;; Move Cursors to end/beginning
+(define-key prefix_o (kbd "C-h") 'move-beginning-of-line)
+(define-key prefix_o (kbd "C-l") 'move-end-of-line)
+(define-key prefix_o (kbd "C-n") 'exchange-point-and-mark)  
+;; kill words
+(global-set-key (kbd "C-d") 'smart/delete)
+(define-key prefix_o (kbd "C-j") 'smart/backward-kill-word)
+(define-key prefix_o (kbd "C-k") 'smart/kill-inner-word)
+;; Comment / visual too 
+(define-key prefix_o (kbd "C-f") 'comment-line)
+;; Faster Dir travel
+(define-key prefix_o (kbd "C-p") 'zoxide-travel)
+;; Better terminal
+(define-key prefix_o (kbd "C-t") 'vterm)
+;; Copy Cut
 (define-key prefix_o (kbd "C-o") 'kill-ring-save)    ;; Copy
 (global-set-key (kbd "C-x C-x") 'kill-region)        ;; Cut
+;; Compile
+(global-set-key (kbd "C-c c") 'compile)
+(global-set-key (kbd "C-v") 'execute-extended-command)      ;; extended command ":"
 
 (electric-pair-mode 1)
 
@@ -274,10 +391,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(completions-common-part ((t (:foreground "#f57d26" :weight bold))))
- '(completions-highlight ((t (:foreground "#f57d26" :weight bold))))
- '(corfu-current ((t (:background "#edf0cd" :foreground "#5c6a72" :weight bold))))
- '(corfu-default ((t (:background "#fffbef" :foreground "#5c6a72"))))
- '(orderless-match-face-0 ((t (:foreground "#f57d26" :weight bold))))
- '(orderless-match-face-1 ((t (:foreground "#f85552" :weight bold))))
- '(vertico-current ((t (:background "#edf0cd" :weight bold)))))
+ )
