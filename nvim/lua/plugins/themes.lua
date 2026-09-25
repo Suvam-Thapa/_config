@@ -18,15 +18,16 @@
 -- 	end,
 -- }
 
--- return {
--- 	"neanias/everforest-nvim",
--- 	version = false,
--- 	lazy = false,
--- 	priority = 1200,
--- 	config = function()
--- 		require("everforest").setup({
--- 			ui_contrast = "high",
--- 		})
--- 		vim.cmd.colorscheme("everforest")
--- 	end,
--- }
+return {
+  "sainnhe/gruvbox-material",
+  lazy = false,
+  priority = 1000,
+  config = function()
+    -- Set options before loading the colorscheme
+    vim.g.gruvbox_material_background = "soft"
+    vim.g.gruvbox_material_better_performance = 1
+
+    -- Load the colorscheme
+    vim.cmd("colorscheme gruvbox-material")
+  end,
+}

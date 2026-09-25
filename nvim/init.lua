@@ -2,8 +2,7 @@
 === Options ===
 --]]
 vim.loader.enable()
-vim.opt.background = "dark"
-vim.cmd.colorscheme("lena")
+vim.opt.background = "light"
 
 vim.opt.number = true
 vim.opt.relativenumber = true
